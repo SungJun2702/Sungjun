@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Warrior
+  - Archer
+  - Assassin
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Nopassing
+  - BACK
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 2430072491
+    locked: 0
+  - name: UI
+    uniqueID: 3154117639
+    locked: 0
+  - name: backGround
+    uniqueID: 2203852905
+    locked: 0
+  - name: abov
+    uniqueID: 1926256355
+    locked: 0
+  - name: object
+    uniqueID: 1548107353
+    locked: 0

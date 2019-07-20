@@ -1,0 +1,163 @@
+#────────────────────────────────────────────────────────────────────────────
+# ▶ MUI_Shortcut
+# --------------------------------------------------------------------------
+# Author    Mr. Mo
+# Modify    뮤 (mu29@unis.kr, www.unis.kr)
+# Date      2011. 12. 18
+# --------------------------------------------------------------------------
+# Description
+# 
+#    MUI_HUD의 단축키 부분입니다.
+#    스킬 및 아이템의 사용을 담당합니다.
+#────────────────────────────────────────────────────────────────────────────
+
+class MUI_HUD < Window_Base
+  alias shortcut_update update
+  def update
+    shortcut_update
+    # 단축키 등록
+    if Input.mouse_rbutton
+      width = (Mouse.x - 622) / 34
+      height = (Mouse.y - 466) / 34
+      if width >= 0 and width <= 4 and height >= 0 and height <= 1
+        @Keys[height * 5 + width] = nil
+        Network::send("<shortcut_del> #{height * 5 + width} </shortcut_del>")
+        refresh
+      end
+    end
+    if $dragdrop
+      x, y = Input.mouse_pos
+      if @drag_sprite == nil
+        @drag_sprite = Sprite.new
+        @drag_sprite.bitmap = Bitmap.new(24,24)
+        @drag_sprite.opacity = 255
+        @drag_sprite.z = 999999
+        @drag_sprite.bitmap.blt(0,0,RPG::Cache.icon($dragdrop.icon_name),Rect.new(0,0,24,24))
+      end
+      @drag_sprite.x = x - 12 if x
+      @drag_sprite.y = y - 12 if y
+      if not Input.mouse_lbutton
+        width = (Mouse.x - 622) / 34
+        height = (Mouse.y - 466) / 34
+        if width >= 0 and width <= 4 and height >= 0 and height <= 1
+          if $dragdrop.is_a?(RPG::Skill)
+            $dragdrop.description.sub(/\[([0-9]+)\]/) do
+              $game_player.skill_delay[$dragdrop.name] = 0
+              $game_player.save_skill_delay[$dragdrop.name] = $1.to_i
+            end
+          else
+            for key in @Keys
+              if key == $dragdrop
+                $console.write_red("이미 등록된 아이템입니다.")
+                $dragdrop = nil
+                return
+              end
+            end
+          end
+          type = $dragdrop.class.to_s.gsub!("RPG::","")
+          Network::send("<shortcut_add> #{height * 5 + width} #{type} #{$dragdrop.id} </shortcut_add>")
+          @Keys[height * 5 + width] = $dragdrop
+          refresh
+        end
+        $dragdrop = nil
+      end
+    else
+      @drag_sprite.dispose if @drag_sprite != nil
+      @drag_sprite = nil
+    end
+    return if $game_player.battler.dead?
+    return if MUI.IsChat
+    # 단축키 사용
+    if Key2.trigger?(KEY_1_2)
+      keypress(0)
+    elsif Key2.trigger?(KEY_2_2)
+      keypress(1)
+    elsif Key2.trigger?(KEY_3_2)
+      keypress(2)
+    elsif Key2.trigger?(KEY_4_2)
+      keypress(3)
+    elsif Key2.trigger?(KEY_5_2)
+      keypress(4)
+    elsif Key2.trigger?(KEY_Q2)
+      keypress(5)
+    elsif Key2.trigger?(KEY_W2)
+      keypress(6)
+    elsif Key2.trigger?(KEY_E2)
+      keypress(7)
+    elsif Key2.trigger?(KEY_R2)
+      keypress(8)
+    elsif Key2.trigger?(KEY_T2)
+      keypress(9)
+    end
+  end
+  
+  def keypress(key)
+    case @Keys[key]
+    when RPG::Skill
+      use_skill(@Keys[key])
+    when RPG::Item
+      use_item(@Keys[key], key)
+    when RPG::Weapon
+      equip_weapon(@Keys[key], key)
+    when RPG::Armor
+      equip_armor(@Keys[key], key)
+    end
+    refresh
+  end
+  
+  def use_item(item, key)
+    return if not $game_party.item_number(item.id) > 0
+    $game_temp.common_event_id = item.common_event_id if item.common_event_id > 0
+    $game_party.actors[0].item_effect(item)
+    $game_system.se_play(item.menu_se)
+    if item.consumable
+      $game_party.lose_item(item.id, 1)
+    end
+    if $game_party.item_number(item.id) <= 0
+      @Keys[key] = nil
+      refresh
+    end
+  end
+  
+  def equip_weapon(item, key)
+    return if not $game_party.weapon_number(item.id) > 0
+    if $game_party.actors[0].equippable?(item)
+      $game_party.actors[0].equip(0, item.id)
+    end
+    if $game_party.weapon_number(item.id) <= 0
+      @Keys[key] = nil
+      refresh
+    end
+  end
+  
+  def equip_armor(item, key)
+    return if not $game_party.armor_number(item.id) > 0
+    if $game_party.actors[0].equippable?(item)
+      $game_party.actors[0].equip(item.kind + 1, item.id)
+    end
+    if $game_party.armor_number(item.id) <= 0
+      @Keys[key] = nil
+      refresh
+    end
+  end
+  
+  def use_skill(skill)
+    return if not $game_party.actors[0].skills.include?(skill.id)
+    if skill.common_event_id > 0
+      $game_temp.common_event_id = skill.common_event_id
+    end
+    for i in skill.element_set
+      case $data_system.elements[i]
+      when "근거리"
+        $game_player.player_melee(skill)
+      when "원거리"
+        $game_player.player_distance(skill)
+      when "범위"
+        $game_player.player_range(skill)
+      when "총알"
+      when "버프"
+        $game_player.player_buff(skill)
+      end
+    end
+  end
+end

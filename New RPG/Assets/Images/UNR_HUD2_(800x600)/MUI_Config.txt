@@ -1,0 +1,55 @@
+#────────────────────────────────────────────────────────────────────────────
+# ▶ Config
+# --------------------------------------------------------------------------
+# Author    뮤 (mu29@unis.kr, www.unis.kr)
+# Date      2011. 6. 30
+# --------------------------------------------------------------------------
+# Description
+# 
+#    사용자 설정 부분입니다.
+#────────────────────────────────────────────────────────────────────────────
+module Config
+  # 서버 설정
+  SERVER = [["127.0.0.1", 50000, "ME"]]
+  Admin_Pass = "유니스"
+  Welcome_Message = "본 게임은 Unis Net RMXP를 사용합니다."
+  Welcome_Message2 = "서버 프레임워크 : Netronics (이상혁)"
+  Join_Message = " 님이 접속 하셨습니다."
+  Exit_Message = " 님이 접속 해제하셨습니다."
+  
+  PVPMAP = [3, 4]
+  GUILDPVPMAP = [4]
+  
+  # 폰트 설정
+  FONT = "나눔고딕"
+  FONTSIZE = 14
+  
+  # 부활 위치 설정
+  ReBirth_ID = 4
+  ReBirth_X = 9
+  ReBirth_Y = 7
+  
+  # HUD 설정
+  MOUSE = "001-Weapon01"
+  
+  SKILL_HUD_X = 479
+  SKILL_HUD_Y = 414
+  
+  CHAT_X = 10
+  CHAT_Y = 430
+  CHAT_WIDTH = 300
+  CHAT_HEIGHT = 80
+  
+  HP_X = 251
+  HP_Y = 548
+  HP_WIDTH = 160
+  HP_HEIGHT = 12
+  SP_X = 251
+  SP_Y = 567
+  SP_WIDTH = 160
+  SP_HEIGHT = 12
+  EXP_X = 0
+  EXP_Y = 588
+  EXP_WIDTH = 800
+  EXP_HEIGHT = 12
+end

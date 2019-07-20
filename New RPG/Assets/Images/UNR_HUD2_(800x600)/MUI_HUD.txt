@@ -1,0 +1,241 @@
+#────────────────────────────────────────────────────────────────────────────
+# ▶ MUI_HUD Ver 2.0
+# --------------------------------------------------------------------------
+# Author    Mr. Mo
+# Modify    뮤 (mu29@unis.kr, www.unis.kr)
+# Modify    jubin-park
+# Graphic   마니아(secretlit713@naver.com, hongdam_@naver.com)
+# Date      2013. 1. 23
+# --------------------------------------------------------------------------
+# Description
+# 
+#    헤드 업 디스플레이를 표시합니다.
+#    메뉴 클릭이 가능하며, 단축키를 등록할 수 있습니다.
+#────────────────────────────────────────────────────────────────────────────
+
+# 변수 초기화
+HP_X = Config::HP_X
+HP_Y = Config::HP_Y
+HP_WIDTH = Config::HP_WIDTH
+HP_HEIGHT = Config::HP_HEIGHT
+SP_X = Config::SP_X
+SP_Y = Config::SP_Y
+SP_WIDTH = Config::SP_WIDTH
+SP_HEIGHT = Config::SP_HEIGHT
+EXP_X = Config::EXP_X
+EXP_Y = Config::EXP_Y
+EXP_WIDTH = Config::EXP_WIDTH
+EXP_HEIGHT = Config::EXP_HEIGHT
+
+class MUI_HUD < Window_Base
+  attr_accessor :Keys
+  def initialize
+    super(-16, -16, 1000, 1000)
+    @actor = $game_party.actors[0]
+    @old_hp = @actor.hp
+    @old_sp = @actor.sp
+    @old_exp = @actor.exp
+    @level = @actor.level
+    @old_guild = $userdata.guild_name
+    @Keys = []
+    self.contents = Bitmap.new(width - 32, height - 32)
+    # 윈도우를 감춘다
+    self.opacity = 0
+    refresh
+  end
+  
+  # 리프레쉬
+  def refresh
+    self.contents.clear
+    self.contents.font.name = "나눔고딕 ExtraBold"
+    self.contents.font.bold = false
+    # 새 정보를 저장
+    @actor = $game_party.actors[0]
+    @old_hp = @actor.hp
+    @old_sp = @actor.sp
+    @old_exp = @actor.exp
+    @level = @actor.level
+    @old_guild = $userdata.guild_name
+    bitmap = RPG::Cache.mui("HUD.png")
+    self.contents.blt(0, 0, bitmap, Rect.new(0, 0, 800, 600))
+    #레벨
+    self.contents.font.color = Color.new(0,0,0)
+    self.contents.font.size = 30
+    self.contents.draw_text(76, 548, 60, 30, @actor.level.to_s, 1)
+    self.contents.draw_text(76+1, 548-1, 60, 30, @actor.level.to_s, 1)
+    self.contents.draw_text(76-1, 548+1, 60, 30, @actor.level.to_s, 1)
+    self.contents.draw_text(76+1, 548+1, 60, 30, @actor.level.to_s, 1)
+    self.contents.draw_text(76-1, 548-1, 60, 30, @actor.level.to_s, 1)
+    self.contents.font.color = Color.new(255,255,255)
+    self.contents.draw_text(76, 548, 60, 30, @actor.level.to_s, 1)
+    #이름
+    self.contents.font.color = Color.new(0,0,0)
+    self.contents.font.name = "나눔고딕"
+    self.contents.font.size = 14
+    self.contents.draw_text(137, 540, 79, 30, @actor.name.to_s, 1)
+    self.contents.draw_text(137+1, 540-1, 79, 30, @actor.name.to_s, 1)
+    self.contents.draw_text(137-1, 540+1, 79, 30, @actor.name.to_s, 1)
+    self.contents.draw_text(137+1, 540+1, 79, 30, @actor.name.to_s, 1)
+    self.contents.draw_text(137-1, 540-1, 79, 30, @actor.name.to_s, 1)
+    self.contents.font.color = Color.new(255,255,255)
+    self.contents.draw_text(137, 540, 79, 30, @actor.name.to_s, 1)
+    #길드
+    self.contents.font.color = Color.new(0,0,0)
+    self.contents.draw_text(137, 558, 79, 30, $userdata.guild_name.to_s, 1)
+    self.contents.draw_text(137+1, 558-1, 79, 30, $userdata.guild_name.to_s, 1)
+    self.contents.draw_text(137-1, 558+1, 79, 30, $userdata.guild_name.to_s, 1)
+    self.contents.draw_text(137+1, 558+1, 79, 30, $userdata.guild_name.to_s, 1)
+    self.contents.draw_text(137-1, 558-1, 79, 30, $userdata.guild_name.to_s, 1)
+    self.contents.font.color = Color.new(255,201,14)
+    self.contents.draw_text(137, 558, 79, 30, $userdata.guild_name.to_s, 1)
+    #체력
+    draw_bar(HP_X, HP_Y, @actor.hp, @actor.maxhp, HP_BAR, HP_WIDTH, HP_HEIGHT)
+    self.contents.font.color = Color.new(0,0,0,100)
+    self.contents.font.size = 11
+    self.contents.draw_text(254, 539, 640, 30, @actor.hp.to_s + "/" + @actor.maxhp.to_s)
+    self.contents.draw_text(254+1, 539-1, 640, 30, @actor.hp.to_s + "/" + @actor.maxhp.to_s)
+    self.contents.draw_text(254-1, 539+1, 640, 30, @actor.hp.to_s + "/" + @actor.maxhp.to_s)
+    self.contents.draw_text(254+1, 539+1, 640, 30, @actor.hp.to_s + "/" + @actor.maxhp.to_s)
+    self.contents.draw_text(254-1, 539-1, 640, 30, @actor.hp.to_s + "/" + @actor.maxhp.to_s)
+    self.contents.font.color = Color.new(255,255,255)
+    self.contents.draw_text(254, 539, 640, 30, @actor.hp.to_s + "/" + @actor.maxhp.to_s)
+    #마력
+    draw_bar(SP_X, SP_Y, @actor.sp, @actor.maxsp, SP_BAR, SP_WIDTH, SP_HEIGHT)
+    self.contents.font.color = Color.new(0,0,0,100)
+    self.contents.draw_text(254, 558, 640, 30, @actor.sp.to_s + "/" + @actor.maxsp.to_s)
+    self.contents.draw_text(254+1, 558-1, 640, 30, @actor.sp.to_s + "/" + @actor.maxsp.to_s)
+    self.contents.draw_text(254-1, 558+1, 640, 30, @actor.sp.to_s + "/" + @actor.maxsp.to_s)
+    self.contents.draw_text(254+1, 558+1, 640, 30, @actor.sp.to_s + "/" + @actor.maxsp.to_s)
+    self.contents.draw_text(254-1, 558-1, 640, 30, @actor.sp.to_s + "/" + @actor.maxsp.to_s)
+    self.contents.font.color = Color.new(255,255,255)
+    self.contents.draw_text(254, 558, 640, 30, @actor.sp.to_s + "/" + @actor.maxsp.to_s)
+    #경험치
+    min = @actor.level == 99 ? 1 : @actor.now_exp
+    max = @actor.level == 99 ? 1 : @actor.next_exp
+    draw_bar(EXP_X, EXP_Y, min, max, EXP_BAR, EXP_WIDTH, EXP_HEIGHT)
+    bitmap = RPG::Cache.mui("EXP_Duck.png")
+    self.contents.blt(Config::EXP_X, Config::EXP_Y, bitmap, Rect.new(0, 0, EXP_WIDTH, EXP_HEIGHT))
+    self.contents.font.color = Color.new(0,0,0,100)
+    self.contents.draw_text(0, 580, 800, 30, min.to_s + "/" + max.to_s + " ", 2)
+    self.contents.draw_text(0+1, 580-1, 800, 30, min.to_s + "/" + max.to_s + " ", 2)
+    self.contents.draw_text(0-1, 580+1, 800, 30, min.to_s + "/" + max.to_s + " ", 2)
+    self.contents.draw_text(0+1, 580+1, 800, 30, min.to_s + "/" + max.to_s + " ", 2)
+    self.contents.draw_text(0-1, 580-1, 800, 30, min.to_s + "/" + max.to_s + " ", 2)
+    self.contents.font.color = Color.new(255,255,255)
+    self.contents.draw_text(0, 580, 800, 30, min.to_s + "/" + max.to_s + " ", 2)
+    
+    self.contents.font.size = 14
+    self.contents.font.bold = false
+    for i in 0..@Keys.size
+      next if not @Keys[i]
+      self.contents.blt(622 + (i % 5) * 34, 466 + (i / 5) * 34, RPG::Cache.icon(@Keys[i].icon_name),Rect.new(0,0,24,24))
+      case @Keys[i]
+      when RPG::Item
+        self.contents.draw_text(617 + (i % 5) * 34, 477 + (i / 5) * 34, 32, 20, $game_party.item_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(617 + (i % 5) * 34, 476 + (i / 5) * 34, 32, 20, $game_party.item_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(617 + (i % 5) * 34, 478 + (i / 5) * 34, 32, 20, $game_party.item_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(615 + (i % 5) * 34, 476 + (i / 5) * 34, 32, 20, $game_party.item_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(615 + (i % 5) * 34, 478 + (i / 5) * 34, 32, 20, $game_party.item_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(615 + (i % 5) * 34, 477 + (i / 5) * 34, 32, 20, $game_party.item_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(616 + (i % 5) * 34, 476 + (i / 5) * 34, 32, 20, $game_party.item_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(616 + (i % 5) * 34, 478 + (i / 5) * 34, 32, 20, $game_party.item_number(@Keys[i].id).to_s, 2)
+        self.contents.font.color.set(0, 0, 0)
+        self.contents.draw_text(616 + (i % 5) * 34, 477 + (i / 5) * 34, 32, 20, $game_party.item_number(@Keys[i].id).to_s, 2)
+        self.contents.font.color.set(255, 255, 255)
+      when RPG::Weapon
+        self.contents.draw_text(617 + (i % 5) * 34, 477 + (i / 5) * 34, 32, 20, $game_party.weapon_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(617 + (i % 5) * 34, 476 + (i / 5) * 34, 32, 20, $game_party.weapon_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(617 + (i % 5) * 34, 478 + (i / 5) * 34, 32, 20, $game_party.weapon_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(615 + (i % 5) * 34, 476 + (i / 5) * 34, 32, 20, $game_party.weapon_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(615 + (i % 5) * 34, 478 + (i / 5) * 34, 32, 20, $game_party.weapon_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(615 + (i % 5) * 34, 477 + (i / 5) * 34, 32, 20, $game_party.weapon_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(616 + (i % 5) * 34, 476 + (i / 5) * 34, 32, 20, $game_party.weapon_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(616 + (i % 5) * 34, 478 + (i / 5) * 34, 32, 20, $game_party.weapon_number(@Keys[i].id).to_s, 2)
+        self.contents.font.color.set(0, 0, 0)
+        self.contents.draw_text(616 + (i % 5) * 34, 477 + (i / 5) * 34, 32, 20, $game_party.weapon_number(@Keys[i].id).to_s, 2)
+        self.contents.font.color.set(255, 255, 255)
+      when RPG::Armor
+        self.contents.draw_text(617 + (i % 5) * 34, 477 + (i / 5) * 34, 32, 20, $game_party.armor_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(617 + (i % 5) * 34, 476 + (i / 5) * 34, 32, 20, $game_party.armor_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(617 + (i % 5) * 34, 478 + (i / 5) * 34, 32, 20, $game_party.armor_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(615 + (i % 5) * 34, 476 + (i / 5) * 34, 32, 20, $game_party.armor_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(615 + (i % 5) * 34, 478 + (i / 5) * 34, 32, 20, $game_party.armor_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(615 + (i % 5) * 34, 477 + (i / 5) * 34, 32, 20, $game_party.armor_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(616 + (i % 5) * 34, 476 + (i / 5) * 34, 32, 20, $game_party.armor_number(@Keys[i].id).to_s, 2)
+        self.contents.draw_text(616 + (i % 5) * 34, 478 + (i / 5) * 34, 32, 20, $game_party.armor_number(@Keys[i].id).to_s, 2)
+        self.contents.font.color.set(0, 0, 0)
+        self.contents.draw_text(616 + (i % 5) * 34, 477 + (i / 5) * 34, 32, 20, $game_party.armor_number(@Keys[i].id).to_s, 2)
+        self.contents.font.color.set(255, 255, 255)
+      end
+    end
+  end
+
+  # 업데이트
+  def update
+    refresh if change?
+    if mouse_in_area?(0, 420, 640, 60)
+      if Input.mouse_lbutton_click
+        if mouse_in_area?(427, 429, 52, 30)
+          if MUI.Include?(MUI_Status)
+            MUI.Get(MUI_Status).Dispose
+          else
+            MUI_Status.new
+          end
+        elsif mouse_in_area?(480, 429, 50, 30)
+          if MUI.Include?(MUI_Inventory)
+            MUI.Get(MUI_Inventory).Dispose
+          else
+            MUI_Inventory.new
+          end
+        elsif mouse_in_area?(531, 429, 50, 22)
+          if MUI.Include?(MUI_Skill)
+            MUI.Get(MUI_Skill).Dispose
+          else
+            MUI_Skill.new
+          end
+        elsif mouse_in_area?(582, 429, 55, 22)
+          if MUI.Include?(MUI_System)
+            MUI.Get(MUI_System).Dispose
+          else
+            MUI_System.new
+          end
+        end
+      end
+    end
+  end
+  
+  # 정보가 바뀌면
+  def change?
+    return true if @old_hp != @actor.hp or @old_sp != @actor.sp or @old_exp != @actor.exp or @old_guild != $userdata.guild_name
+    return false
+  end
+end
+
+module RPG
+  module Cache
+    def self.mui(filename, hue = 0)
+      self.load_bitmap("Graphics/MUI/", filename, hue)
+    end
+  end
+end
+
+class Window_Base < Window
+  HP_BAR = "HPBAR"
+  SP_BAR = "MPBAR"
+  EXP_BAR = "EXPBAR"
+  OUTLINE = 1
+  BORDER = 1
+
+  def draw_bar(x, y, min, max, file, width, height)
+    bar = RPG::Cache.mui(file)
+    cx = BORDER
+    cy = BORDER
+    percent = min / max.to_f if max != 0
+    percent = 0 if max == 0
+    zoom_x = width
+    zoom_y = height
+    bar_dest_rect = Rect.new(x+cx,y+cy,zoom_x * percent-cx*2,zoom_y-cy*2)
+    bar_source_rect = Rect.new(0,0,bar.width* percent,bar.height)
+    self.contents.stretch_blt(bar_dest_rect, bar, bar_source_rect)
+  end
+end
